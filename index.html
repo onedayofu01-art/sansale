@@ -51,7 +51,7 @@
             var decodedLink = decodeURIComponent(cleanLink);
             
             // Ép cấu chuỗi an toàn tuyệt đối
-            var affLink = "https://shopee.vn" + encodeURIComponent(decodedLink) + "&affiliate_id=" + myAffiliateId;
+            var affLink = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(decodedLink) + "&affiliate_id=" + myAffiliateId;
             
             outputLink.value = affLink;
             resultBox.style.display = 'block';
