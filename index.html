@@ -50,8 +50,9 @@
             // Giải mã link nếu người dùng copy từ Facebook/TikTok bị dính ký tự lạ
             const decodedLink = decodeURIComponent(inputLink);
             
-            // Định dạng tạo link Deeplink tự động của Shopee Affiliate
-            const affLink = `https://shope.ee{myAppId}&url=${encodeURIComponent(decodedLink)}`;
+// Cấu trúc link chuyển hướng Shopee Affiliate mới theo yêu cầu của bạn
+const myAffiliateId = "17363570097";
+const affLink = `https://shopee.vn{encodeURIComponent(decodedLink)}&affiliate_id=${myAffiliateId}`;
             
             outputLink.value = affLink;
             resultBox.style.display = 'block';
