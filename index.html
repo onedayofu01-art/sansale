@@ -34,11 +34,11 @@
 
 <script>
     function generateAffLink() {
-        const inputLink = document.getElementById('shopeeLink').value.trim();
-        const resultBox = document.getElementById('resultBox');
-        const outputLink = document.getElementById('outputLink');
+        var inputLink = document.getElementById('shopeeLink').value.trim();
+        var resultBox = document.getElementById('resultBox');
+        var outputLink = document.getElementById('outputLink');
         
-        const myAffiliateId = "17363570097"; 
+        var myAffiliateId = "17363570097"; 
 
         if (inputLink === "") {
             alert("Vui lòng dán link Shopee vào!");
@@ -46,12 +46,12 @@
         }
 
         try {
-            // Tách lấy link gốc sạch trước khi mã hóa (loại bỏ fbclid nếu có)
-            const cleanLink = inputLink.split('?')[0];
-            const decodedLink = decodeURIComponent(cleanLink);
+            // Cắt bỏ phần theo dõi thừa từ link gốc
+            var cleanLink = inputLink.split('?')[0];
+            var decodedLink = decodeURIComponent(cleanLink);
             
-            // ĐÃ SỬA: Cấu trúc chính xác theo yêu cầu của bạn, có dấu $ trước dấu ngoặc nhọn
-            const affLink = `https://shopee.vn{encodeURIComponent(decodedLink)}&affiliate_id=${myAffiliateId}`;
+            // Sử dụng phép cộng chuỗi truyền thống để loại bỏ hoàn toàn lỗi dấu nháy ngược
+            var affLink = "https://shopee.vn" + encodeURIComponent(decodedLink) + "&affiliate_id=" + myAffiliateId;
             
             outputLink.value = affLink;
             resultBox.style.display = 'block';
@@ -61,7 +61,7 @@
     }
 
     function copyToClipboard() {
-        const copyText = document.getElementById("outputLink");
+        var copyText = document.getElementById("outputLink");
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(copyText.value);
