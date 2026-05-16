@@ -24,10 +24,11 @@
     <p>Dán link sản phẩm Shopee vào đây để nhận mã giảm giá</p>
     
     <input type="text" id="shopeeLink" placeholder="Nhập liên kết sản phẩm Shopee...">
-    <button id="btnSubmit" onclick="generateAffLink()">Tạo Link Ngay</button>
+    <button onclick="generateAffLink()">Tạo Link Ngay</button>
 
     <div class="result-box" id="resultBox">
-        <p style="font-weight: bold; color: #333;">Nội dung Affiliate của bạn:</p>
+        <p style="font-weight: bold; color: #333;">Lấy mã 25% FB:</p>
+        <!-- Đổi thành thẻ textarea để hiển thị văn bản nhiều dòng -->
         <textarea id="outputLink" readonly></textarea>
         <button class="btn-copy" onclick="copyToClipboard()">Copy Văn Bản</button>
     </div>
@@ -38,8 +39,8 @@
         var inputLink = document.getElementById('shopeeLink').value.trim();
         var resultBox = document.getElementById('resultBox');
         var outputLink = document.getElementById('outputLink');
-        var btnSubmit = document.getElementById('btnSubmit');
         
+        // Cấu hình ID cho 2 bước theo yêu cầu của bạn
         var idBuoc1 = "17307950127"; 
         var idBuoc2 = "17363570097"; 
 
@@ -52,55 +53,34 @@
             inputLink = "https://" + inputLink;
         }
 
-        // Hiển thị trạng thái đang xử lý link
+        var resultLink = inputLink;
         resultBox.style.display = 'block';
-        outputLink.value = "Đang xử lý vượt tường lửa Shopee, vui lòng đợi trong giây lát...";
-        btnSubmit.disabled = true;
-        btnSubmit.innerText = "Đang xử lý...";
-
-        var finalTargetLink = inputLink;
+        outputLink.value = "Đang xử lý dữ liệu liên kết...";
 
         try {
-            // Kiểm tra nếu là các dạng link ngắn bị Shopee chặn (s.shopee.vn, shope.ee, vn.shp.ee)
-            if (inputLink.includes("shp.ee") || inputLink.includes("shope.ee") || inputLink.includes("s.shopee.vn")) {
-                
-                // Sử dụng API cổng mở trung gian để bóc tách lịch sử chuyển hướng (Redirect Location)
-                var apiUrl = "https://allorigins.win" + encodeURIComponent(inputLink);
-                var response = await fetch(apiUrl);
-                var data = await response.json();
-                var htmlText = data.contents;
-                
-                // Tìm kiếm URL sản phẩm gốc ẩn trong mã mã hóa redirect của Shopee
-                var match = htmlText.match(/window\.location\.replace\(['"]([^'"]+)['"]\)/) || 
-                            htmlText.match(/href="([^"]+)"/) || 
-                            htmlText.match(/url=([^"&'\s]+)/i);
+            if (inputLink.includes("shp.ee") || inputLink.includes("shope.ee")) {
+                var proxyUrl = "https://images" + ~~(Math.random() * 33) + "://googleusercontent.com" + encodeURIComponent(inputLink);
+                var response = await fetch(proxyUrl);
+                var htmlText = await response.text();
+                var match = htmlText.match(/href="([^"]+)"/) || htmlText.match(/URL=([^"]+)"/) || htmlText.match(/"url":"([^"]+)"/);
                 
                 if (match && match[1]) {
-                    finalTargetLink = match[1];
+                    resultLink = match[1];
                 } else {
-                    // Nếu allorigins lỗi, chuyển sang API dự phòng 2 chuyên dụng
-                    var backupUrl = "https://unshorten.me" + encodeURIComponent(inputLink);
-                    var backupResponse = await fetch(backupUrl);
-                    var backupData = await backupResponse.json();
-                    if (backupData && backupData.success && backupData.unshortened_url) {
-                        finalTargetLink = backupData.unshortened_url;
-                    }
+                    resultLink = response.url.split('url=')[1] ? decodeURIComponent(response.url.split('url=')[1]) : inputLink;
                 }
             }
 
-            // Giải mã ký tự lạ nếu có
-            var decodedLink = decodeURIComponent(finalTargetLink);
-            
-            // XỬ LÝ CHÍNH XÁC: Cắt bỏ hoàn toàn dấu hỏi chấm (?) và các mã sp_atk phía sau
+            var decodedLink = decodeURIComponent(resultLink);
             if (decodedLink.includes("?")) {
                 decodedLink = decodedLink.split('?')[0];
             }
             
-            // Tạo 2 link tương ứng với 2 ID theo kịch bản của bạn
-            var linkBuoc1 = "https://shopee.vn" + encodeURIComponent(decodedLink) + "&affiliate_id=" + idBuoc1;
-            var linkBuoc2 = "https://shopee.vn" + encodeURIComponent(decodedLink) + "&affiliate_id=" + idBuoc2;
+            // Tạo link mã hóa cho riêng từng bước
+            var linkBuoc1 = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(decodedLink) + "&affiliate_id=" + idBuoc1;
+            var linkBuoc2 = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(decodedLink) + "&affiliate_id=" + idBuoc2;
             
-            // Xuất ra nội dung kịch bản 2 bước hoàn chỉnh
+            // Ghép thành mẫu văn bản hướng dẫn hoàn chỉnh xuống dòng chuẩn chỉnh
             var finalTemplate = "Cách lấy mã 25% FB, đảm bảo làm đủ 2 bước nhé \n" +
                                 "Bước 1: Ấn vào link\n" +
                                 linkBuoc1 + "\n" +
@@ -110,20 +90,14 @@
             outputLink.value = finalTemplate;
 
         } catch (error) {
-            console.error(error);
-            // Nếu lỗi API, hệ thống sẽ sử dụng link đầu vào làm link gốc để người dùng không bị hỏng bài đăng
-            var fallbackLink1 = "https://shopee.vn" + encodeURIComponent(inputLink) + "&affiliate_id=" + idBuoc1;
-            var fallbackLink2 = "https://shopee.vn" + encodeURIComponent(inputLink) + "&affiliate_id=" + idBuoc2;
+            var fallbackLink1 = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(inputLink) + "&affiliate_id=" + idBuoc1;
+            var fallbackLink2 = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(inputLink) + "&affiliate_id=" + idBuoc2;
             
             outputLink.value = "Cách lấy mã 25% FB, đảm bảo làm đủ 2 bước nhé \n" +
                                "Bước 1: Ấn vào link\n" +
                                fallbackLink1 + "\n" +
                                "Bước 2: Quay lại ấn vào link sau để mua với mã giảm giá\n" +
                                fallbackLink2;
-        } finally {
-            // Mở lại nút bấm
-            btnSubmit.disabled = false;
-            btnSubmit.innerText = "Tạo Link Ngay";
         }
     }
 
@@ -132,7 +106,7 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(copyText.value);
-        alert("Đã copy kịch bản 2 bước thành công!");
+        alert("Đã copy thành công!");
     }
 </script>
 
