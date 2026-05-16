@@ -83,13 +83,13 @@
             }
             
             // Nối chuỗi tạo link Affiliate cuối cùng
-            var affLink = "https://shopee.vn" + encodeURIComponent(decodedLink) + "&affiliate_id=" + myAffiliateId;
+            var affLink = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(decodedLink) + "&affiliate_id=" + myAffiliateId;
             
             outputLink.value = affLink;
 
         } catch (error) {
             // Nếu có lỗi mạng, vẫn xuất link Affiliate dựa trên link ngắn của người dùng để không gián đoạn trải nghiệm
-            var fallbackLink = "https://shopee.vn" + encodeURIComponent(inputLink) + "&affiliate_id=" + myAffiliateId;
+            var fallbackLink = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(inputLink) + "&affiliate_id=" + myAffiliateId;
             outputLink.value = fallbackLink;
             console.log("Xử lý rút gọn bằng chế độ dự phòng độc lập.");
         }
