@@ -60,7 +60,49 @@
         try {
             if (inputLink.includes("shp.ee") || inputLink.includes("shope.ee")) {
                 var proxyUrl = "https://images" + ~~(Math.random() * 33) + "://googleusercontent.com" + encodeURIComponent(inputLink);
-                var response = await fetch(proxyUrl);
+              
+try {
+
+    // gọi Cloudflare Worker
+    const response = await fetch(
+        "https://shopee-resolve.onedayofu01.workers.dev",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                url: inputLink
+            })
+        }
+    );
+
+    const data = await response.json();
+
+    if (!data.success) {
+        throw new Error(data.error);
+    }
+
+    // link sạch
+    const cleanLink = data.final;
+
+    // tạo affiliate link
+    const affLink =
+        "https://s.shopee.vn/an_redir?origin_link=" +
+        encodeURIComponent(cleanLink) +
+        "&affiliate_id=" +
+        myAffiliateId;
+
+    outputLink.value = affLink;
+
+} catch (error) {
+
+    console.log(error);
+
+    outputLink.value =
+        "Không xử lý được link.";
+}
+                
                 var htmlText = await response.text();
                 var match = htmlText.match(/href="([^"]+)"/) || htmlText.match(/URL=([^"]+)"/) || htmlText.match(/"url":"([^"]+)"/);
                 
