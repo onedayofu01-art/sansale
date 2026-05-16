@@ -28,7 +28,6 @@
 
     <div class="result-box" id="resultBox">
         <p style="font-weight: bold; color: #333;">Nội dung Affiliate của bạn:</p>
-        <!-- Đổi thành thẻ textarea để hiển thị văn bản nhiều dòng -->
         <textarea id="outputLink" readonly></textarea>
         <button class="btn-copy" onclick="copyToClipboard()">Copy Văn Bản</button>
     </div>
@@ -40,7 +39,6 @@
         var resultBox = document.getElementById('resultBox');
         var outputLink = document.getElementById('outputLink');
         
-        // Cấu hình ID cho 2 bước theo yêu cầu của bạn
         var idBuoc1 = "17307950127"; 
         var idBuoc2 = "17363570097"; 
 
@@ -55,32 +53,40 @@
 
         var resultLink = inputLink;
         resultBox.style.display = 'block';
-        outputLink.value = "Đang xử lý dữ liệu liên kết...";
+        outputLink.value = "Đang vượt tường lửa giải mã liên kết Shopee mới, xin vui lòng chờ...";
 
         try {
-            if (inputLink.includes("shp.ee") || inputLink.includes("shope.ee")) {
-                var proxyUrl = "https://images" + ~~(Math.random() * 33) + "://googleusercontent.com" + encodeURIComponent(inputLink);
-                var response = await fetch(proxyUrl);
-                var htmlText = await response.text();
-                var match = htmlText.match(/href="([^"]+)"/) || htmlText.match(/URL=([^"]+)"/) || htmlText.match(/"url":"([^"]+)"/);
+            // Kiểm tra nếu là link rút gọn bao gồm cả định dạng mới s.shopee.vn
+            if (inputLink.includes("shp.ee") || inputLink.includes("shope.ee") || inputLink.includes("s.shopee.vn")) {
+                
+                // Giải pháp tối ưu: Sử dụng API miễn phí của hai bên uy tín có hỗ trợ render JS ngầm để vượt lỗi Please enable JavaScript
+                var apiUrl = "https://allorigins.win" + encodeURIComponent(inputLink);
+                
+                var response = await fetch(apiUrl);
+                var data = await response.json();
+                var htmlText = data.contents;
+                
+                // Trích xuất link đích dài thông qua thẻ chuyển hướng nội dung của Shopee
+                var match = htmlText.match(/window\.location\.replace\(['"]([^'"]+)['"]\)/) || 
+                            htmlText.match(/href="([^"]+)"/) || 
+                            htmlText.match(/url=([^"&'\s]+)/i);
                 
                 if (match && match[1]) {
                     resultLink = match[1];
-                } else {
-                    resultLink = response.url.split('url=')[1] ? decodeURIComponent(response.url.split('url=')[1]) : inputLink;
                 }
             }
 
             var decodedLink = decodeURIComponent(resultLink);
+            
+            // Tiến hành cắt bỏ hoàn toàn các tham số sp_atk hay credential_token sau dấu chấm hỏi (?)
             if (decodedLink.includes("?")) {
                 decodedLink = decodedLink.split('?')[0];
             }
             
-            // Tạo link mã hóa cho riêng từng bước
+            // Xây dựng chuỗi liên kết Affiliate 2 bước hoàn chỉnh
             var linkBuoc1 = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(decodedLink) + "&affiliate_id=" + idBuoc1;
             var linkBuoc2 = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(decodedLink) + "&affiliate_id=" + idBuoc2;
             
-            // Ghép thành mẫu văn bản hướng dẫn hoàn chỉnh xuống dòng chuẩn chỉnh
             var finalTemplate = "Cách lấy mã 25% FB, đảm bảo làm đủ 2 bước nhé \n" +
                                 "Bước 1: Ấn vào link\n" +
                                 linkBuoc1 + "\n" +
@@ -90,6 +96,8 @@
             outputLink.value = finalTemplate;
 
         } catch (error) {
+            console.error(error);
+            // Phương án dự phòng an toàn nếu API quá tải: Giữ nguyên cấu trúc link ngắn đầu vào để không làm gián đoạn hệ thống
             var fallbackLink1 = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(inputLink) + "&affiliate_id=" + idBuoc1;
             var fallbackLink2 = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(inputLink) + "&affiliate_id=" + idBuoc2;
             
@@ -106,7 +114,7 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(copyText.value);
-        alert("Đã copy toàn bộ kịch bản 2 bước thành công!");
+        alert("Đã copy thành công!");
     }
 </script>
 
