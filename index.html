@@ -6,6 +6,7 @@
     <title>Tạo Link Shopee</title>
 
     <style>
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -28,7 +29,9 @@
             margin-bottom: 20px;
         }
 
-        input[type="text"] {
+        input[type="text"],
+        textarea {
+
             width: 100%;
             padding: 12px;
             margin: 10px 0;
@@ -37,17 +40,16 @@
             box-sizing: border-box;
         }
 
-        /* Ô textarea vô hình nằm ngầm để hệ thống copy dữ liệu */
         textarea {
-            position: absolute;
-            left: -9999px;
-            top: -9999px;
-            opacity: 0;
-            width: 1px;
-            height: 1px;
+
+            height: 180px;
+            resize: none;
+            font-size: 14px;
+            line-height: 1.5;
         }
 
         button {
+
             width: 100%;
             padding: 12px;
             background-color: #ee4d2d;
@@ -64,129 +66,204 @@
             background-color: #d33b1c;
         }
 
-        /* Khung viền kết quả mặc định ẩn lúc ban đầu */
         .result-box {
+
             margin-top: 20px;
             display: none;
             background: #f9f9f9;
-            padding: 20px;
+            padding: 15px;
             border-radius: 5px;
             border: 1px dashed #ee4d2d;
         }
 
         .btn-copy {
             background-color: #0084ff;
-            margin-top: 10px;
         }
 
         .btn-copy:hover {
             background-color: #0066cc;
         }
+
     </style>
+
 </head>
 
 <body>
 
 <div class="container">
+
     <h1>Tạo Link Shopee</h1>
-    <p>Dán link sản phẩm Shopee vào đây</p>
 
-    <input type="text" id="shopeeLink" placeholder="Nhập link Shopee...">
-    <button id="btnSubmit" onclick="generateAffLink()">Tạo Link Ngay</button>
+    <p>
+        Dán link sản phẩm Shopee vào đây
+    </p>
 
-    <!-- Hộp chứa kết quả (Mặc định ẩn lúc mới vào trang) -->
-    <div class="result-box" id="resultBox">
-        <p style="font-weight:bold; color:#333; margin-top: 0; margin-bottom: 0; font-size: 18px;">
+    <input
+        type="text"
+        id="shopeeLink"
+        placeholder="Nhập link Shopee..."
+    >
+
+    <button onclick="generateAffLink()">
+        Tạo Link Ngay
+    </button>
+
+    <div
+        class="result-box"
+        id="resultBox"
+    >
+
+        <p
+            style="
+                font-weight:bold;
+                color:#333;
+            "
+        >
             Lấy mã 25% FB:
         </p>
 
-        <!-- Ô text ẩn chứa dữ liệu ngầm -->
-        <textarea id="outputLink" readonly></textarea>
+        <textarea
+            id="outputLink"
+            readonly
+        ></textarea>
 
-        <button class="btn-copy" onclick="copyToClipboard()">
+        <button
+            class="btn-copy"
+            onclick="copyToClipboard()"
+        >
             Copy link lấy mã
         </button>
+
     </div>
+
 </div>
 
 <script>
-async function generateAffLink() {
-let inputLink = document.getElementById("shopeeLink").value.trim();
-    const resultBox = document.getElementById("resultBox");
-    const outputLink = document.getElementById("outputLink");
-    const btnSubmit = document.getElementById("btnSubmit");
 
+async function generateAffLink() {
+
+    let inputLink =
+        document
+        .getElementById("shopeeLink")
+        .value
+        .trim();
+
+    const resultBox =
+        document.getElementById("resultBox");
+
+    const outputLink =
+        document.getElementById("outputLink");
+
+    // Affiliate IDs
     const idBuoc1 = "17307950127";
     const idBuoc2 = "17363570097";
 
     if (!inputLink) {
+
         alert("Vui lòng nhập link Shopee");
+
         return;
     }
 
-    if (!inputLink.startsWith("http://") && !inputLink.startsWith("https://")) {
+    // tự thêm https
+    if (
+        !inputLink.startsWith("http://") &&
+        !inputLink.startsWith("https://")
+    ) {
+
         inputLink = "https://" + inputLink;
     }
 
-    resultBox.style.display = "none";
-    btnSubmit.disabled = true;
-    btnSubmit.innerText = "Đang xử lý...";
+    resultBox.style.display = "block";
+
+    outputLink.value =
+        "Đang xử lý dữ liệu...";
 
     try {
-        // gọi Worker của bạn để giải mã link
+
+        // gọi Worker
         const response = await fetch(
-            "https://workers.dev",
+            "https://shopee-resolve.onedayofu01.workers.dev",
             {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ url: inputLink })
+
+                headers: {
+                    "Content-Type":
+                    "application/json"
+                },
+
+                body: JSON.stringify({
+                    url: inputLink
+                })
             }
         );
 
-        const data = await response.json();
+        const data =
+            await response.json();
+
         if (!data.success) {
+
             throw new Error(data.error);
         }
 
-        const cleanLink = data.final;
+        // link sạch
+        const cleanLink =
+            data.final;
 
-        // ĐÃ THAY ĐỔI: Sử dụng domain s.shopee.vn/an_redir?origin_link= theo đúng yêu cầu mới
-        const linkBuoc1 = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(cleanLink) + "&affiliate_id=" + idBuoc1;
-        const linkBuoc2 = "https://s.shopee.vn/an_redir?origin_link=" + encodeURIComponent(cleanLink) + "&affiliate_id=" + idBuoc2;
+        // tạo affiliate links
+        const linkBuoc1 =
+            "https://s.shopee.vn/an_redir?origin_link=" +
+            encodeURIComponent(cleanLink) +
+            "&affiliate_id=" +
+            idBuoc1;
+        const linkBuoc2 =
+            "https://s.shopee.vn/an_redir?origin_link=" +
+            encodeURIComponent(cleanLink) +
+            "&affiliate_id=" +
+            idBuoc2;
 
-        const finalTemplate = 
+        // template
+        const finalTemplate =
+
 `Cách lấy mã 25% FB, đảm bảo làm đủ 2 bước nhé
 Bước 1: Ấn vào link
 ${linkBuoc1}
 Bước 2: Quay lại ấn vào link sau để mua với mã giảm giá
 ${linkBuoc2}`;
 
-        outputLink.value = finalTemplate;
-        resultBox.style.display = "block";
+        outputLink.value =
+            finalTemplate;
 
     } catch (error) {
+
         console.log(error);
-        alert("Không xử lý được link.");
-        resultBox.style.display = "none";
-    } finally {
-        btnSubmit.disabled = false;
-        btnSubmit.innerText = "Tạo Link Ngay";
+
+        outputLink.value =
+            "Không xử lý được link.";
     }
 }
 
 function copyToClipboard() {
-    const copyText = document.getElementById("outputLink");
+
+    const copyText =
+        document.getElementById(
+            "outputLink"
+        );
+
     copyText.select();
-    copyText.setSelectionRange(0, 99999);
-    
-    try {
-        document.execCommand("copy");
-        alert("Đã copy thành công kịch bản 2 bước!");
-    } catch (err) {
-        navigator.clipboard.writeText(copyText.value);
-        alert("Đã copy!");
-    }
+
+    copyText.setSelectionRange(
+        0,
+        99999
+    );
+
+    navigator.clipboard.writeText(
+        copyText.value
+    );
+
+    alert("Đã copy!");
 }
+
 </script>
 
 </body>
