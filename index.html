@@ -127,23 +127,62 @@
         </button>
 
         <a
-    href="https://www.facebook.com/share/p/1HBc1Lj8on/"
-    target="_blank"
-    style="
-        display:block;
-        width:100%;
-        padding:12px;
-        background-color:#42b72a;
-        color:white;
-        text-decoration:none;
-        border-radius:5px;
-        font-weight:bold;
-        margin-top:10px;
-        box-sizing:border-box;
-    "
->
-    Dán vào post này để lấy mã 25%
-</a>
+            href="https://www.facebook.com/share/p/1HBc1Lj8on/"
+            target="_blank"
+            style="
+                display:block;
+                width:100%;
+                padding:12px;
+                background-color:#42b72a;
+                color:white;
+                text-decoration:none;
+                border-radius:5px;
+                font-weight:bold;
+                margin-top:10px;
+                box-sizing:border-box;
+            "
+        >
+            Dán vào post này để lấy mã 25%
+        </a>
+
+        <div
+            style="
+                margin-top:20px;
+                padding-top:15px;
+                border-top:1px dashed #ccc;
+            "
+        >
+
+            <div
+                style="
+                    font-weight:bold;
+                    margin-bottom:10px;
+                    color:#555;
+                "
+            >
+                Link dự phòng
+            </div>
+
+            <button
+                onclick="copyBackup1()"
+                style="
+                    background:#ff9800;
+                "
+            >
+                Sao chép link lấy mã 22% (1)
+            </button>
+
+            <button
+                onclick="copyBackup2()"
+                style="
+                    background:#ff9800;
+                    margin-top:8px;
+                "
+            >
+                Sao chép link lấy mã 22% (2)
+            </button>
+
+        </div>
 
     </div>
 
@@ -168,6 +207,10 @@ async function generateAffLink() {
     // Affiliate IDs
     const idBuoc1 = "17307950127";
     const idBuoc2 = "17363570097";
+
+    // backup 22%
+    const idBackup1 = "17395070485";
+    const idBackup2 = "BBBBBBBB";
 
     if (!inputLink) {
 
@@ -234,7 +277,7 @@ async function generateAffLink() {
             "&affiliate_id=" +
             idBuoc2;
 
-        // template
+        // template chính
         const finalTemplate =
 `Cách lấy mã 25% FB, đảm bảo làm đủ 2 bước nhé
 Bước 1: Ấn vào link
@@ -244,6 +287,16 @@ ${linkBuoc2}`;
 
         outputLink.value =
             finalTemplate;
+
+        // backup 1
+        window.backupTemplate1 =
+`Cách lấy mã 22% nhé
+https://s.shopee.vn/an_redir?origin_link=${encodeURIComponent(cleanLink)}&affiliate_id=${idBackup1}`;
+
+        // backup 2
+        window.backupTemplate2 =
+`Cách lấy mã 22% nhé
+https://s.shopee.vn/an_redir?origin_link=${encodeURIComponent(cleanLink)}&affiliate_id=${idBackup2}`;
 
     } catch (error) {
 
@@ -268,8 +321,25 @@ function copyToClipboard() {
     alert("Đã copy!");
 }
 
+function copyBackup1() {
+
+    navigator.clipboard.writeText(
+        window.backupTemplate1 || "Chưa tạo link"
+    );
+
+    alert("Đã copy link dự phòng 1!");
+}
+
+function copyBackup2() {
+
+    navigator.clipboard.writeText(
+        window.backupTemplate2 || "Chưa tạo link"
+    );
+
+    alert("Đã copy link dự phòng 2!");
+}
+
 </script>
 
 </body>
 </html>
-
