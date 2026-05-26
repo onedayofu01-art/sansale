@@ -255,10 +255,7 @@ async function generateAffLink() {
         inputLink = "https://" + inputLink;
     }
 
-    resultBox.style.display = "block";
-
-    outputLink.value =
-        "Đang xử lý dữ liệu...";
+    resultBox.style.display = "none";
 
     try {
 
@@ -314,6 +311,7 @@ ${linkBuoc2}`;
 
         outputLink.value =
             finalTemplate;
+        resultBox.style.display = "block";
 
 // backup 1
 window.backupTemplate1 =
